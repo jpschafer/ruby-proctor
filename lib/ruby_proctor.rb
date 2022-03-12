@@ -5,6 +5,8 @@
 $:.unshift File.dirname($0)
 
 # includes
+require 'rubygems'
+
 require_relative 'ruby_proctor/constants.rb'
 require_relative 'ruby_proctor/Exam.rb'
 require_relative 'ruby_proctor/Question.rb'

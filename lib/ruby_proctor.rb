@@ -34,11 +34,11 @@ def ruby_proctor
 
   # Check that only a filename is passed
   if ARGV.length < 1
-    puts "Too few arguments, arguments are as follows: rubyProctor.exe <file_path> <num_questions> <time_in_minutes> "
+    puts "Too few arguments, arguments are as follows: ruby_proctor <file_path> <num_questions> <time_in_minutes> "
     puts "Exiting..."
     exit
   elsif ARGV.length > 3
-    puts "Too many arguments, arguments are as follows: rubyProctor.exe <file_path> <num_questions> <time_in_minutes> "
+    puts "Too many arguments, arguments are as follows: ruby_proctor <file_path> <num_questions> <time_in_minutes> "
     puts "Exiting..."
     exit
   end

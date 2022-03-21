@@ -7,12 +7,12 @@ $:.unshift File.dirname($0)
 # includes
 require 'rubygems'
 
-require_relative 'ruby_proctor/constants.rb'
-require_relative 'ruby_proctor/Exam.rb'
-require_relative 'ruby_proctor/Question.rb'
-require_relative 'ruby_proctor/Processor.rb'
-require_relative 'ruby_proctor/Proctor.rb'
-require_relative 'ruby_proctor/string_ext.rb'
+require 'ruby_proctor/constants.rb'
+require 'ruby_proctor/exam.rb'
+require 'ruby_proctor/question.rb'
+require 'ruby_proctor/processor.rb'
+require 'ruby_proctor/proctor.rb'
+require 'ruby_proctor/string_ext.rb'
 
 include Constants
 

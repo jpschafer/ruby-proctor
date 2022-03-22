@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'ruby_proctor'
+require 'rubygems'
+require 'bundler/setup'
+
+require 'ruby_proctor.rb'
 
 ruby_proctor()

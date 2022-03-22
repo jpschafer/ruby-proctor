@@ -1,7 +1,8 @@
-require_relative 'constants'
-require_relative 'Question'
-require_relative 'Exam'
-require_relative 'string_ext'
+require 'ruby_proctor/constants'
+require 'ruby_proctor/question'
+require 'ruby_proctor/exam'
+require 'ruby_proctor/string_ext'
+
 include Constants
 
 class Processor
@@ -65,7 +66,7 @@ class Processor
             raise ProcessingError, "Answer Key is empty - Line #" + line_num.to_s
           else
             last_symbol = Constants::A_END
-            questions.append(last_question)
+            questions.push(last_question)
             line_count = 0
           end
         else
@@ -79,7 +80,7 @@ class Processor
                 raise ProcessingError, "Correct answer not an integer - Line #" + line_num.to_s
               end
             else
-              last_question.answers.append(line)
+              last_question.answers.push(line)
             end
             line_count += 1
           elsif last_symbol == Constants::A_END
@@ -108,7 +109,7 @@ class Processor
         break
       end
 
-      exam_questions.append(question)
+      exam_questions.push(question)
       count += 1 # Ruby doesnt have incrementation syntax!
     end
 

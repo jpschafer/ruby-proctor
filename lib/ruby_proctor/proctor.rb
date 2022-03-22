@@ -1,6 +1,6 @@
-require_relative 'Question'
-require_relative 'Exam'
-require_relative 'string_ext'
+require 'ruby_proctor/question'
+require 'ruby_proctor/exam'
+require 'ruby_proctor/string_ext'
 require 'timeout'
 
 class Proctor

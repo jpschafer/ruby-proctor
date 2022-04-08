@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    os (1.1.4)
+    tk (0.4.0)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  os
+  tk
+
+BUNDLED WITH
+   2.3.6

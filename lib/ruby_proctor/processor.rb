@@ -34,7 +34,7 @@ class Processor
     question_count = 0;
 
     line_num = 0
-    IO.foreach(ARGV[0]) do |l|
+    IO.foreach(@file) do |l|
       line_num += 1
       line = l.strip
 

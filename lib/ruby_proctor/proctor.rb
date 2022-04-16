@@ -56,14 +56,8 @@ class Proctor
 
   end
 
-  def grade_exam(start_time)
-    num_correct = 0
-    exam.questions.each do |question|
-      if question.correct_answer.eql?(question.selected_answer)
-        num_correct += 1
-      end
-    end
 
+  def print_exam_results(start_time)
     puts '################'
     puts '# Exam Results #'
     puts '################'
@@ -92,6 +86,44 @@ class Proctor
 
       puts 'Time Elapsed: ' + time_elapsed_hours.to_s + ':' + time_elapsed_minutes.to_s + ':' + time_elapsed_seconds.to_s
       puts 'Time Left: ' + time_left_hours.to_s + ':' + time_left_minutes.to_s + ':' + time_left_seconds.to_s
+      puts ""
+    end
+  end
+
+  def grade_exam(start_time)
+    num_correct = 0
+    exam.questions.each do |question|
+      if question.correct_answer.eql?(question.selected_answer)
+        num_correct += 1
+      end
+    end
+
+    # Calculate Percentage
+    grade = (num_correct.to_f / exam.questions.length.to_f) * 100
+
+    #puts 'Number of Questions Answered Correctly: ' + num_correct.to_s + ' / ' + exam.questions.length.to_s
+    @exam.results.num_correct = num_correct
+    @exam.results.total_questions = exam.questions.length
+    @exam.results.grade = grade.to_s + '%'
+    @exam.results.letter_grade = get_letter_grade(grade)
+    @exam.results.time_started = start_time.strftime("%m/%d/%Y %I:%M %p")
+    @exam.results.time_completed = Time.now.strftime("%m/%d/%Y %I:%M %p")
+
+    if (@time > 0)
+      # Calculate Time Left
+      time_elapsed = calc_time_elapsed(start_time).round
+      time_left = calc_time_left(start_time).round
+
+      time_elapsed_hours = time_elapsed / (60*60)
+      time_elapsed_minutes = (time_elapsed / 60) % 60
+      time_elapsed_seconds = time_elapsed % 60
+
+      time_left_hours = time_left / (60*60)
+      time_left_minutes = (time_left / 60) % 60
+      time_left_seconds = time_left % 60
+
+      @exam.results.time_elapsed = time_elapsed_hours.to_s + ':' + time_elapsed_minutes.to_s + ':' + time_elapsed_seconds.to_s
+      @exam.results.time_left =  time_left_hours.to_s + ':' + time_left_minutes.to_s + ':' + time_left_seconds.to_s
       puts ""
     end
   end

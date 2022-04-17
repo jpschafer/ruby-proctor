@@ -1,6 +1,8 @@
 require 'ruby_proctor/question'
 require 'ruby_proctor/exam'
 require 'ruby_proctor/string_ext'
+require 'ruby_proctor/logger'
+
 require 'timeout'
 
 class Proctor
@@ -10,6 +12,7 @@ class Proctor
   def initialize(exam, time)
     @exam = exam
     @time = time
+    @logger = Logger.new
   end
 
   def officiate_exam
@@ -52,46 +55,37 @@ class Proctor
     end
     puts "Exam is Over!\n\n"
 
-    grade_exam(start_time)
+    print_exam_results(start_time)
+
+    @logger.write_to_log(@exam)
 
   end
 
 
   def print_exam_results(start_time)
     puts '################'
-    puts '# Exam Results #'
+    puts '# Quiz Results #'
     puts '################'
     puts ''
 
     # Calculate Percentage
-    grade = (num_correct.to_f / exam.questions.length.to_f) * 100
+    grade = grade_exam(start_time)
 
-    puts 'Number of Questions Answered Correctly: ' + num_correct.to_s + ' / ' + exam.questions.length.to_s
-    puts 'Grade (Percentage): ' + grade.to_s + '%'
-    puts 'Letter Grade: ' + get_letter_grade(grade)
-    puts 'Time Completed: ' + Time.now.strftime("%m/%d/%Y %I:%M %p")
+    puts 'Number of Questions Answered Correctly: ' + @exam.results.num_correct.to_s + ' / ' + @exam.results.total_questions.to_s
+    puts 'Grade (Percentage): ' + @exam.results.grade.to_s
+    puts 'Letter Grade: ' + @exam.results.letter_grade
+    puts 'Time Completed: ' + @exam.results.time_completed
 
     if (@time > 0)
-      # Calculate Time Left
-      time_elapsed = calc_time_elapsed(start_time).round
-      time_left = calc_time_left(start_time).round
-
-      time_elapsed_hours = time_elapsed / (60*60)
-      time_elapsed_minutes = (time_elapsed / 60) % 60
-      time_elapsed_seconds = time_elapsed % 60
-
-      time_left_hours = time_left / (60*60)
-      time_left_minutes = (time_left / 60) % 60
-      time_left_seconds = time_left % 60
-
-      puts 'Time Elapsed: ' + time_elapsed_hours.to_s + ':' + time_elapsed_minutes.to_s + ':' + time_elapsed_seconds.to_s
-      puts 'Time Left: ' + time_left_hours.to_s + ':' + time_left_minutes.to_s + ':' + time_left_seconds.to_s
+      puts 'Time Elapsed: ' + @exam.results.time_elapsed
+      puts 'Time Left: ' + @exam.results.time_left
       puts ""
     end
   end
 
   def grade_exam(start_time)
     num_correct = 0
+    grade = 0
     exam.questions.each do |question|
       if question.correct_answer.eql?(question.selected_answer)
         num_correct += 1
@@ -126,6 +120,7 @@ class Proctor
       @exam.results.time_left =  time_left_hours.to_s + ':' + time_left_minutes.to_s + ':' + time_left_seconds.to_s
       puts ""
     end
+    grade
   end
 
   def get_letter_grade(grade)

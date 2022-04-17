@@ -6,7 +6,7 @@ class Exam
 
   def initialize(questions)
     @questions = questions
-    @results = new Results()
+    @results = Results.new
   end
 
   class Results

@@ -1,4 +1,9 @@
 source 'https://rubygems.org'
 
 gem 'os'
-gem 'tk'
+
+# Restricts tk to only be used for Windows bundling
+require 'os'
+if OS.windows?
+  gem 'tk'
+end

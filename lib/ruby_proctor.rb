@@ -3,13 +3,12 @@ require 'bundler/setup'
 
 require 'os'
 
-require 'ruby_proctor/interfaces/terminal'
-require 'ruby_proctor/interfaces/gui'
-
 def ruby_proctor
   if OS.posix?
+    require 'ruby_proctor/interfaces/terminal'
     ruby_proctor_terminal()
   elsif OS.windows?
+    require 'ruby_proctor/interfaces/gui'
     ruby_proctor_gui()
   end
 end

@@ -1,3 +1,5 @@
+require 'os'
+
 module Constants
   COMMENT = '*'
   Q_START = '@Q'
@@ -5,5 +7,7 @@ module Constants
   A_END = '@E'
 
   QUESTION_NUM_LINES = 10
-  EXAM_MAX_QUESTIONS = 10000
+  QUIZ_MAX_QUESTIONS = 10000
+
+  QUIZ_FILE_NAME = OS.windows? ? "quizlog.dat" : ".quizlog"
 end

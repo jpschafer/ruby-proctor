@@ -43,7 +43,7 @@ class Logger
   def read_from_log
     quiz_attempts = Array.new
     YAML.load_stream(File.read(@file_path)) do |document|
-      puts document
+      #puts document
       if document.key?("uid") && document["uid"] == @real_uid
         quiz_attempts.push(OpenStruct.new(document))
       end
@@ -58,12 +58,17 @@ class Logger
 
     for attempt in quiz_attempts do
 
-      puts "| Quiz # " + quiz_num.to_s + "|"
-      puts '---------------------------'
+      puts "| Quiz # " + quiz_num.to_s + " |"
+      puts "---------------------------"
 
       puts 'Number of Questions Answered Correctly: ' + attempt.num_correct.to_s + ' / ' + attempt.total_questions.to_s
       puts 'Grade (Percentage): ' + attempt.grade.to_s
       puts 'Letter Grade: ' + attempt.letter_grade
+      
+      if (attempt.quiz_name)
+        puts 'Quiz Name: ' + attempt.quiz_name
+      end
+      puts 'Time Started: ' + attempt.time_started
       puts 'Time Completed: ' + attempt.time_completed
 
       if (attempt.time_elapsed && attempt.time_left)
@@ -71,7 +76,8 @@ class Logger
         puts 'Time Left: ' + attempt.time_left
         puts ""
       end
-      puts '---------------------------'
+      puts ""
+      #puts "---------------------------\n\n\n"
       quiz_num += 1
     end
   end

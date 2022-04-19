@@ -93,10 +93,10 @@ class Processor
       # process the line of text here
     end
 
-    create_exam(questions)
+    create_exam(File.basename(@file), questions)
   end
 
-  def create_exam(questions)
+  def create_exam(filename, questions)
     exam_questions = Array.new
 
     questions.shuffle! # Shuffles original array by Ruby's internal randomization algorithm
@@ -117,6 +117,6 @@ class Processor
       raise ProcessingError.new "No Questions were processed from the exam file, probably an empty file"
     end
 
-    Exam.new(exam_questions)
+    Exam.new(filename, exam_questions)
   end
 end

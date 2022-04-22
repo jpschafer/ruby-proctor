@@ -1,9 +1,6 @@
 # main.rb
 #
 
-# Include Dir for OCRA
-$:.unshift File.dirname($0)
-
 # includes
 require 'rubygems'
 require 'bundler/setup'

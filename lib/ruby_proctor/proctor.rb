@@ -104,20 +104,22 @@ class Proctor
     @exam.results.time_started = start_time.strftime("%m/%d/%Y %I:%M %p")
     @exam.results.time_completed = Time.now.strftime("%m/%d/%Y %I:%M %p")
 
+    time_elapsed = calc_time_elapsed(start_time).round
+
+    time_elapsed_hours = time_elapsed / (60*60)
+    time_elapsed_minutes = (time_elapsed / 60) % 60
+    time_elapsed_seconds = time_elapsed % 60
+
+    @exam.results.time_elapsed = time_elapsed_hours.to_s + ':' + time_elapsed_minutes.to_s + ':' + time_elapsed_seconds.to_s
+
     if (@time > 0)
       # Calculate Time Left
-      time_elapsed = calc_time_elapsed(start_time).round
       time_left = calc_time_left(start_time).round
-
-      time_elapsed_hours = time_elapsed / (60*60)
-      time_elapsed_minutes = (time_elapsed / 60) % 60
-      time_elapsed_seconds = time_elapsed % 60
 
       time_left_hours = time_left / (60*60)
       time_left_minutes = (time_left / 60) % 60
       time_left_seconds = time_left % 60
 
-      @exam.results.time_elapsed = time_elapsed_hours.to_s + ':' + time_elapsed_minutes.to_s + ':' + time_elapsed_seconds.to_s
       @exam.results.time_left =  time_left_hours.to_s + ':' + time_left_minutes.to_s + ':' + time_left_seconds.to_s
       puts ""
     end

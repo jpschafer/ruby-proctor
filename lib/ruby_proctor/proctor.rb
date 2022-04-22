@@ -74,10 +74,11 @@ class Proctor
     puts 'Number of Questions Answered Correctly: ' + @exam.results.num_correct.to_s + ' / ' + @exam.results.total_questions.to_s
     puts 'Grade (Percentage): ' + @exam.results.grade.to_s
     puts 'Letter Grade: ' + @exam.results.letter_grade
+    puts 'Time Started: ' + @exam.results.time_started
     puts 'Time Completed: ' + @exam.results.time_completed
+    puts 'Time Elapsed: ' + @exam.results.time_elapsed
 
     if (@time > 0)
-      puts 'Time Elapsed: ' + @exam.results.time_elapsed
       puts 'Time Left: ' + @exam.results.time_left
       puts ""
     end

@@ -7,11 +7,11 @@
 # Second Argument is path for quiz application (Which will be chowned to you, with the suid flag set for applications with executable rights for everyone
 
 echo "Welcome to Ruby Proctor Linux Setup!"
-read -p "Enter Quizlog Storage Path for admin user (Make sure you have access!) [~/.ruby-proctor/.quizlog]: " quizlog_path
-quizlog_path=${quizlog_path:-'~/.ruby_proctor/.quizlog'}
+read -p "Enter Quizlog Storage Path for admin user (Make sure you have access!) [/var/log/.quizlog]: " quizlog_path
+quizlog_path=${quizlog_path:-'/var/log/.quizlog'}
 
 read -p "Enter Application Path (Where to Copy and Make Executable for Users with SUID Enabled) [/bin/ruby-proctor]: " quizlog_path
-app_path=${quizlog_path:-Richard}
+app_path=${app_path:-'/bin/ruby-proctor'}
 echo $app_path
 
 echo -n "Making Empty Quizlog file..."
@@ -21,7 +21,10 @@ echo "Done!"
 echo -n "Copying Ruby Proctor & Creating Quizlog Symlink..."
 mkdir -p "${app_path%/*}"
 cp ruby-proctor "$app_path"
-ln -s $quizlog_path .quizlog
+
+if [ "$quizlog_path" != "/var/log/.quizlog"]
+    ln -s $quizlog_path "/var/log/.quizlog"
+fi 
 echo "Done!"
 
 echo -n "Setting owner & group to ${USER:=$(/usr/bin/id -run)}..."

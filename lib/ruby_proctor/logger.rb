@@ -3,7 +3,11 @@ require 'ruby_proctor/constants'
 require 'ruby_proctor/question'
 require 'ruby_proctor/exam'
 require 'ruby_proctor/string_ext'
+require 'ostruct'
+
 require 'yaml'
+
+require 'os'
 
 include Process::UID
 include Constants
@@ -17,7 +21,12 @@ class Logger
   end
 
   def initialize()
-    @file_path = './' + QUIZ_FILE_NAME
+
+    if OS.windows?
+      @file_path = ENV['ALLUSERSPROFILE'] + "/Ruby Proctor/quizlog.dat"
+    else
+      @file_path = './' + QUIZ_FILE_NAME
+    end
     @real_uid = Process.uid
     @effective_uid = Process.euid
 
@@ -70,9 +79,9 @@ class Logger
       end
       puts 'Time Started: ' + attempt.time_started
       puts 'Time Completed: ' + attempt.time_completed
+      puts 'Time Elapsed: ' + attempt.time_elapsed
 
       if (attempt.time_elapsed && attempt.time_left)
-        puts 'Time Elapsed: ' + attempt.time_elapsed
         puts 'Time Left: ' + attempt.time_left
         puts ""
       end

@@ -50,7 +50,7 @@ if OS.windows?
       grid('row'=>1, 'column'=>0, 'padx'=>25, 'pady'=>5, 'columnspan'=>1, 'sticky'=>'WE')
     end
     config_quiz.comman = Proc.new {
-      configuration(root, set_filepath, set_time_limit, set_number_questions)
+      configuration(root, set_filepath, set_number_questions, set_time_limit)
     }
 
     # Apply Quiz Config Button
@@ -188,8 +188,9 @@ if OS.windows?
             'message' => 'Number of questions must be greater than 0 but no more than 10,000. Specifying more questions than the provided answer key file has will just use all questions available, no repeats'
           )
           return false
+          return false
         end
-      else
+      elsif (number_questions != '')
         Tk.messageBox(
           'type' => 'ok',
           'icon' => 'info',
@@ -211,12 +212,12 @@ if OS.windows?
           )
           return false
         end
-      else
+      elsif (time_limit != '')
         Tk.messageBox(
           'type' => 'ok',
           'icon' => 'info',
           'title' => 'Time Limit must be a number greater than 0',
-          'message' => 'Leave Minutes Blank if you want unlimited time.'
+          'message' => 'Time Limit must be a number greater than 0 *Leave Minutes Blank if you want unlimited time)'
         )
         return false
       end
@@ -269,13 +270,22 @@ if OS.windows?
       # progress_bar.pack("side" => 'bottom')
       #progress_bar.mode = indeterminate
 
-      processor = Processor.new(filepath, number_questions)
-
+      # Ruby is really weird with Local & Instance Variables
+      if (number_questions.value.empty?)
+        processor = Processor.new(filepath, -1)
+      else
+        processor = Processor.new(filepath, number_questions)
+      end
       # Try to Process, and cleanly display any exceptions
       Thread.new {
         begin
             exam = processor.process()
-            exam(exam, time_limit.to_i, root);
+
+            if (time_limit.value.empty?)
+              exam(exam, -1, root)
+            else
+              exam(exam, time_limit.to_i, root)
+            end
         rescue => e
           Tk.messageBox(
             'type' => 'ok',
@@ -300,18 +310,32 @@ if OS.windows?
     time_left = TkVariable.new
     start_time = Time.now
 
+    question_window = TkToplevel.new {  }
+    question_window.grab_set()
+
     thread = false
     if (time_limit && time_limit > 0)
       thread = Thread.new {
         time_limit.downto(0) do |i|
           time_left.value = i
-          sleep 60
+
+          if (i > 0)
+            sleep 60
+          end
         end
+
+        proctor = Proctor.new(exam, 0)
+        proctor.grade_exam(start_time)
+
+        question_window.destroy()
+
+        logger = Logger.new
+        logger.write_to_log(exam)
+
+        display_results(exam.results)
+
       }
     end
-
-    question_window = TkToplevel.new {  }
-    question_window.grab_set()
 
     display_question(exam, 0, question_window, true, start_time, time_left, thread)
   end
@@ -329,17 +353,19 @@ if OS.windows?
     end
 
     # Timer
-    time_left_num = TkLabel.new(question_window) {
-      text "Time Left (Minutes): "
-      pack('side' => 'top', 'padx'=>5, 'pady'=>5)
-    }
+    if (timer_thread)
+      time_left_num = TkLabel.new(question_window) {
+        text "Time Left (Minutes): "
+        pack('side' => 'top', 'padx'=>5, 'pady'=>5)
+      }
 
-    time_left_text = TkEntry.new(question_window) {
-      textvariable time_left
-      pack('side' => 'top', 'padx'=>5, 'pady'=>5)
-      state 'disabled'
-      justify 'center'
-    }
+      time_left_text = TkEntry.new(question_window) {
+        textvariable time_left
+        pack('side' => 'top', 'padx'=>5, 'pady'=>5)
+        state 'disabled'
+        justify 'center'
+      }
+    end
 
     TkSeparator.new(question_window) do
       pack('fill' => 'x')

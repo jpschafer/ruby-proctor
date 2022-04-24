@@ -8,4 +8,4 @@ require 'bundler/setup'
 
 require 'ruby_proctor.rb'
 
-#ruby_proctor()
+ruby_proctor()

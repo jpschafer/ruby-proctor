@@ -324,7 +324,7 @@ if OS.windows?
           end
         end
 
-        proctor = Proctor.new(exam, 0)
+        proctor = Proctor.new(exam, time_limit)
         proctor.grade_exam(start_time)
 
         question_window.destroy()
@@ -337,10 +337,10 @@ if OS.windows?
       }
     end
 
-    display_question(exam, 0, question_window, true, start_time, time_left, thread)
+    display_question(exam, 0, question_window, true, start_time, time_left, thread, time_limit)
   end
 
-  def display_question(exam, question_num, question_window, initialize, start_time, time_left, timer_thread)
+  def display_question(exam, question_num, question_window, initialize, start_time, time_left, timer_thread, time_limit)
 
     human_question_num = question_num + 1
 
@@ -407,7 +407,7 @@ if OS.windows?
 
     previous_button.comman = Proc.new {
       exam.questions[question_num].selected_answer = answer.value
-      display_question(exam, question_num - 1, question_window, false, start_time, time_left, timer_thread)
+      display_question(exam, question_num - 1, question_window, false, start_time, time_left, timer_thread, time_limit)
     }
 
     next_button = TkButton.new(question_window) {
@@ -417,7 +417,7 @@ if OS.windows?
 
     next_button.comman = Proc.new {
       exam.questions[question_num].selected_answer = answer.value
-      display_question(exam, question_num + 1, question_window, false, start_time, time_left, timer_thread)
+      display_question(exam, question_num + 1, question_window, false, start_time, time_left, timer_thread, time_limit)
     }
 
       if (1 == human_question_num)
@@ -447,7 +447,7 @@ if OS.windows?
           timer_thread.kill()
         end
 
-        proctor = Proctor.new(exam, 0)
+        proctor = Proctor.new(exam, time_limit)
         proctor.grade_exam(start_time)
 
         question_window.destroy()

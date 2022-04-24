@@ -5,7 +5,7 @@ require 'bundler/setup' # IS unable to find os-1.1.4 on OCRA windows, lots of ch
 
 require 'os'
 
-ruby_proctor()
+def ruby_proctor()
   if OS.posix?
     require 'ruby_proctor/interfaces/terminal.rb'
     ruby_proctor_terminal()

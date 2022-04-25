@@ -57,10 +57,18 @@ def ruby_proctor_terminal
   if options.view_quizzes && options_hash.length == 1
     # Delegate Printing out All Quizzes for current PID
     logger = Logger.new
-    quiz_attempts = logger.read_from_log
-    logger.print_quiz_attempts(quiz_attempts)
-    puts "Exiting..."
-    exit
+
+    begin
+      quiz_attempts = logger.read_from_log
+      logger.print_quiz_attempts(quiz_attempts)
+      puts "Exiting..."
+      exit
+    rescue => e
+      puts "** Error Reading Log File: " + e.message + " **"
+      puts "Try Resolving the above error, and try running again\n\n"
+      puts "Exiting..."
+      exit # Exit Program, we can't use this Exam File
+    end
   elsif options.view_quizzes && options_hash.length > 1
     puts "Invalid Arguments: No other Arguments can be used with -v for viewing the quizzes"
     puts "Exiting..."
@@ -84,6 +92,7 @@ def ruby_proctor_terminal
   #   puts "Exiting..."
   #   exit
   #end
+  options.file_path.untaint()
 
   filepath = options.file_path
   max_questions = -1
@@ -123,10 +132,10 @@ def ruby_proctor_terminal
     end
   end
 
-  if(!File.exist?(filepath))
-    puts 'Questions File not found, exiting..'
-    exit
-  end
+  # if(!File.exist?(filepath))
+  #   puts 'Questions File not found, exiting..'
+  #   exit
+  # end
 
   #puts "Welcome to Ruby Proctor!\n"
 

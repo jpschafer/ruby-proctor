@@ -57,7 +57,12 @@ class Proctor
 
     print_exam_results(start_time)
 
+      # Try to Process, and cleanly display any exceptions
+  begin
     @logger.write_to_log(@exam)
+  rescue => e
+    puts "** Error Writing to Log File: " + e.message + " **"
+  end
 
   end
 

@@ -25,7 +25,7 @@ class Logger
     if OS.windows?
       @file_path = ENV['ALLUSERSPROFILE'] + "/Ruby Proctor/quizlog.dat"
     else
-      @file_path = './' + QUIZ_FILE_NAME
+      @file_path = '/var/log/' + QUIZ_FILE_NAME
     end
     @real_uid = Process.uid
     @effective_uid = Process.euid
@@ -36,9 +36,9 @@ class Logger
       @saved_uid = ''
     end
 
-    puts @saved_uid
-    puts @real_uid
-    puts @effective_uid
+    #puts @saved_uid
+    #puts @real_uid
+    #puts @effective_uid
   end
 
   def write_to_log(exam)
@@ -51,13 +51,18 @@ class Logger
 
   def read_from_log
     quiz_attempts = Array.new
-    YAML.load_stream(File.read(@file_path)) do |document|
-      #puts document
-      if document.key?("uid") && document["uid"] == @real_uid
-        quiz_attempts.push(OpenStruct.new(document))
+
+    begin
+      YAML.load_stream(File.read(@file_path)) do |document|
+        #puts document
+        if document.key?("uid") && document["uid"] == @real_uid
+          quiz_attempts.push(OpenStruct.new(document))
+        end
       end
+      quiz_attempts 
+    rescue => e 
+      raise LoggingError.new "Error Opening File: File doesn't exist or permissions are incorrect!"
     end
-    quiz_attempts 
   end
 
 
@@ -65,29 +70,35 @@ class Logger
 
     quiz_num = 1;
 
-    for attempt in quiz_attempts do
 
-      puts "| Quiz # " + quiz_num.to_s + " |"
-      puts "---------------------------"
+    if (quiz_attempts.length > 0)
 
-      puts 'Number of Questions Answered Correctly: ' + attempt.num_correct.to_s + ' / ' + attempt.total_questions.to_s
-      puts 'Grade (Percentage): ' + attempt.grade.to_s
-      puts 'Letter Grade: ' + attempt.letter_grade
-      
-      if (attempt.quiz_name)
-        puts 'Quiz Name: ' + attempt.quiz_name
-      end
-      puts 'Time Started: ' + attempt.time_started
-      puts 'Time Completed: ' + attempt.time_completed
-      puts 'Time Elapsed: ' + attempt.time_elapsed
+      for attempt in quiz_attempts do
 
-      if (attempt.time_elapsed && attempt.time_left)
-        puts 'Time Left: ' + attempt.time_left
+        puts "| Quiz # " + quiz_num.to_s + " |"
+        puts "---------------------------"
+
+        puts 'Number of Questions Answered Correctly: ' + attempt.num_correct.to_s + ' / ' + attempt.total_questions.to_s
+        puts 'Grade (Percentage): ' + attempt.grade.to_s
+        puts 'Letter Grade: ' + attempt.letter_grade
+        
+        if (attempt.quiz_name)
+          puts 'Quiz Name: ' + attempt.quiz_name
+        end
+        puts 'Time Started: ' + attempt.time_started
+        puts 'Time Completed: ' + attempt.time_completed
+        puts 'Time Elapsed: ' + attempt.time_elapsed
+
+        if (attempt.time_elapsed && attempt.time_left)
+          puts 'Time Left: ' + attempt.time_left
+          puts ""
+        end
         puts ""
+        #puts "---------------------------\n\n\n"
+        quiz_num += 1
       end
-      puts ""
-      #puts "---------------------------\n\n\n"
-      quiz_num += 1
     end
+  else # Why is this useless? 
+    puts "No Quiz Results to Display!"
   end
 end

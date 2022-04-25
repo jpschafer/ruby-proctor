@@ -28,13 +28,13 @@ class Logger
       @file_path = '/var/log/' + QUIZ_FILE_NAME
     end
     @real_uid = Process.uid
-    @effective_uid = Process.euid
+    #@effective_uid = Process.euid
 
-    if (Process::UID.sid_available?)
-      @saved_uid = `ps -p #{Process.pid} -o svuid=`.strip
-    else
-      @saved_uid = ''
-    end
+    #if (Process::UID.sid_available?)
+    #  @saved_uid = `ps -p #{Process.pid} -o svuid=`.strip
+    #else
+    #  @saved_uid = ''
+    #end
 
     #puts @saved_uid
     #puts @real_uid
@@ -97,8 +97,8 @@ class Logger
         #puts "---------------------------\n\n\n"
         quiz_num += 1
       end
+    else # Why is this useless? 
+      puts "No Quiz Results to Display!"
     end
-  else # Why is this useless? 
-    puts "No Quiz Results to Display!"
   end
 end

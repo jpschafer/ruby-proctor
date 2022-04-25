@@ -34,65 +34,69 @@ class Processor
     question_count = 0;
 
     line_num = 0
-    IO.foreach(@file) do |l|
-      line_num += 1
-      line = l.strip
 
-      if line.match(@@_NOT_COMMENT_PATTERN) && !line.empty? # Check first character isn't *, nor all whitespace/empty
-        if line.upcase.match(@@_QUESTION_PATTERN)
-          if last_symbol == Constants::A_START
-            raise ProcessingError, "Answer Key for previous question was not closed - Line #" + line_num.to_s
-          else
-              last_symbol = Constants::Q_START
-              last_question = Question.new(question_count + 1)
-              question_count += 1
-          end
-        elsif line.upcase.match(@@_ANSWERS_START_PATTERN)
-          if !last_question.question.empty?
-            if last_symbol == Constants::Q_START
-              last_symbol = Constants::A_START
-            elsif last_symbol == Constants::A_START
-              raise ProcessingError, "Duplicate answer key start symbol - Line #" + line_num.to_s
-            elsif last_symbol == Constants::A_END
-              raise ProcessingError, "Cannot Have multiple sets of answer keys for one Question - Line #" + line_num.to_s
+    begin 
+      IO.foreach(@file) do |l|
+        line_num += 1
+        line = l.strip
+
+        if line.match(@@_NOT_COMMENT_PATTERN) && !line.empty? # Check first character isn't *, nor all whitespace/empty
+          if line.upcase.match(@@_QUESTION_PATTERN)
+            if last_symbol == Constants::A_START
+              raise ProcessingError, "Answer Key for previous question was not closed - Line #" + line_num.to_s
             else
-              raise ProcessingError, "Cannot attribute answer tag to question (orphaned answer key), check file syntax - Line #" + line_num.to_s
+                last_symbol = Constants::Q_START
+                last_question = Question.new(question_count + 1)
+                question_count += 1
             end
-          else
-            raise ProcessingError, "Question is empty - Line #" + line_num.to_s
-          end
-        elsif line.upcase.match(@@_ANSWERS_END_PATTERN)
-          if (last_question.answers.empty?)
-            raise ProcessingError, "Answer Key is empty - Line #" + line_num.to_s
-          else
-            last_symbol = Constants::A_END
-            questions.push(last_question)
-            line_count = 0
-          end
-        else
-          if last_symbol == Constants::Q_START # Start Processing Question Lines
-            last_question.question += l # Keep Formatting
-          elsif last_symbol == Constants::A_START # Get Correct Answer
-            if line_count == 0
-              if line.is_integer?
-                last_question.correct_answer = line.to_i
+          elsif line.upcase.match(@@_ANSWERS_START_PATTERN)
+            if !last_question.question.empty?
+              if last_symbol == Constants::Q_START
+                last_symbol = Constants::A_START
+              elsif last_symbol == Constants::A_START
+                raise ProcessingError, "Duplicate answer key start symbol - Line #" + line_num.to_s
+              elsif last_symbol == Constants::A_END
+                raise ProcessingError, "Cannot Have multiple sets of answer keys for one Question - Line #" + line_num.to_s
               else
-                raise ProcessingError, "Correct answer not an integer - Line #" + line_num.to_s
+                raise ProcessingError, "Cannot attribute answer tag to question (orphaned answer key), check file syntax - Line #" + line_num.to_s
               end
             else
-              last_question.answers.push(line)
+              raise ProcessingError, "Question is empty - Line #" + line_num.to_s
             end
-            line_count += 1
-          elsif last_symbol == Constants::A_END
-            raise ProcessingError, "Free text outside of Question or Answer Key, Add * to beginning if intended to be a comment - Line #" + line_num.to_s
+          elsif line.upcase.match(@@_ANSWERS_END_PATTERN)
+            if (last_question.answers.empty?)
+              raise ProcessingError, "Answer Key is empty - Line #" + line_num.to_s
+            else
+              last_symbol = Constants::A_END
+              questions.push(last_question)
+              line_count = 0
+            end
           else
-            raise ProcessingError, "Free text before first Question Symbol Add * to beginning if intended to be a comment - Line #" + line_num.to_s
+            if last_symbol == Constants::Q_START # Start Processing Question Lines
+              last_question.question += l # Keep Formatting
+            elsif last_symbol == Constants::A_START # Get Correct Answer
+              if line_count == 0
+                if line.is_integer?
+                  last_question.correct_answer = line.to_i
+                else
+                  raise ProcessingError, "Correct answer not an integer - Line #" + line_num.to_s
+                end
+              else
+                last_question.answers.push(line)
+              end
+              line_count += 1
+            elsif last_symbol == Constants::A_END
+              raise ProcessingError, "Free text outside of Question or Answer Key, Add * to beginning if intended to be a comment - Line #" + line_num.to_s
+            else
+              raise ProcessingError, "Free text before first Question Symbol Add * to beginning if intended to be a comment - Line #" + line_num.to_s
+            end
           end
         end
+        # process the line of text here
       end
-      # process the line of text here
+    rescue => e
+      raise ProcessingError, "Quiz File doesn't exist or cannot be read due to permissions"
     end
-
     create_exam(File.basename(@file), questions)
   end
 

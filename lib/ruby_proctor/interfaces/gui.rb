@@ -524,7 +524,16 @@ if OS.windows?
     }
 
     open_button.comman = Proc.new {
-      display_results(quiz_attempts[list.curselection()[0]])
+      if (list.curselection().length > 0)
+        display_results(quiz_attempts[list.curselection()[0]])
+      else
+        Tk.messageBox(
+          'type' => 'ok',
+          'icon' => 'error',
+          'title' => 'No Quiz File Selected!',
+          'message' => 'Cannot Open, No Quiz File Selected'
+        )
+      end
     }
 
     log_top.update()

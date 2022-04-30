@@ -13,6 +13,9 @@ include Process::UID
 include Constants
 
 class Logger
+
+  attr_accessor :file_path, :real_uid
+
   #YAML.load_stream(File.read('test.yml'))
   class LoggingError < StandardError
     def initialize(msg="Error Occurred During Logging")
@@ -24,10 +27,12 @@ class Logger
 
     if OS.windows?
       @file_path = ENV['ALLUSERSPROFILE'] + "/Ruby Proctor/quizlog.dat"
+      @real_uid  = ENV['USERNAME']
     else
       @file_path = '/var/log/' + QUIZ_FILE_NAME
+      @real_uid = Process.uid
     end
-    @real_uid = Process.uid
+
     #@effective_uid = Process.euid
 
     #if (Process::UID.sid_available?)

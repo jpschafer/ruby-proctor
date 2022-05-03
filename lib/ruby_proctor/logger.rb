@@ -13,6 +13,8 @@ include Process::UID
 include Constants
 
 class Logger
+  attr_accessor :real_uid
+  
   #YAML.load_stream(File.read('test.yml'))
   class LoggingError < StandardError
     def initialize(msg="Error Occurred During Logging")

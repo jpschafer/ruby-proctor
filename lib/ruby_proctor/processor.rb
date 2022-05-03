@@ -94,6 +94,8 @@ class Processor
         end
         # process the line of text here
       end
+    rescue ProcessingError => e
+      raise ProcessingError, e.message
     rescue => e
       raise ProcessingError, "Quiz File doesn't exist or cannot be read due to permissions"
     end

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name        = 'ruby_proctor'
-    s.version     = '1.0.1'
+    s.version     = '1.0.2'
     s.summary     = "Ruby Proctor!"
     s.description = "Automated Exam Proctor Written in Ruby"
     s.authors     = ["Jason Schafer"]

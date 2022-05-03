@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Include Dir for OCRA
-#$LOAD_PATH.unshift File.join(File.dirname($0), '../lib')
+$LOAD_PATH.unshift File.join(File.dirname($0), '../lib')
 
 require 'rubygems'
 require 'bundler/setup'

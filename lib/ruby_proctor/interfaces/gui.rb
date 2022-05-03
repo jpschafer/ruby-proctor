@@ -469,7 +469,7 @@ if OS.windows?
   end
 
   def display_results(results)
-    results_win = TkToplevel.new { title "Ruby Proctor - Quiz Configuration" }
+    results_win = TkToplevel.new { title "Ruby Proctor - Quiz Results" }
     results_win.grab_set()
 
     display_result_attribute(results_win, 0, "Number of Correct Questions", results.num_correct.to_s + ' / ' + results.total_questions.to_s)
@@ -495,41 +495,104 @@ if OS.windows?
     ok_button.comman = Proc.new {
       results_win.destroy()
     }
+
+    results_win.update()
+    results_win['geometry'] = calc_center_geometry(results_win, results_win.winfo_width(), results_win.winfo_height)
   end
 
   def view_log(root)
-    log_top = TkToplevel.new { title "Ruby Proctor - Quiz Log" }
-    log_top.grab_set()
 
-    list = TkListbox.new(log_top) do
-      #width 10
-      height 10
-      setgrid 1
-      selectmode 'browse'
-      pack('fill' => 'x')
+    begin
+      logger = Logger.new
+
+      if (File.exist?(logger.file_path))
+
+        quiz_attempts = logger.read_from_log
+
+        log_top = TkToplevel.new { title "Ruby Proctor - Quiz Log" }
+        log_top.grab_set()
+
+        # Create Frame
+        list_frame = TkFrame.new(log_top) do
+          padx 10
+          pady 10
+          pack('fill' => 'x')
+        end
+
+        list = TkListbox.new(list_frame) do
+          width 0
+          height 10
+          setgrid 1
+          selectmode 'browse'
+          pack('side' => 'left','fill' => 'x', 'expand'=>1)
+        end
+
+        list.bind("Double-Button-1", Proc.new {
+          if (list.curselection().length > 0)
+            display_results(quiz_attempts[list.curselection()[0]])
+          else
+            Tk.messageBox(
+              'type' => 'ok',
+              'icon' => 'error',
+              'title' => 'No Quiz File Selected!',
+              'message' => 'Cannot Open, No Quiz File Selected'
+            )
+          end
+        })
+
+        scrollbar = TkScrollbar.new(list_frame) {
+          command Proc.new {|*args|
+            list.yview(*args)
+          }
+          pack('side'=>'left', 'fill'=>'y')
+        }
+
+        list['yscrollcommand'] = Proc.new {|*args|
+          scrollbar.set(*args)
+        }
+
+        quiz_num = 1
+        for attempt in quiz_attempts do
+          list.insert(quiz_num - 1, quiz_num.to_s + ". - " + attempt.quiz_name)
+          quiz_num += 1
+        end
+
+        open_button = TkButton.new(log_top) {
+          text 'Open Results'
+          pack('side' => 'right', 'padx'=>5, 'pady'=>5)
+        }
+
+        open_button.comman = Proc.new {
+          if (list.curselection().length > 0)
+            display_results(quiz_attempts[list.curselection()[0]])
+          else
+            Tk.messageBox(
+              'type' => 'ok',
+              'icon' => 'error',
+              'title' => 'No Quiz File Selected!',
+              'message' => 'Cannot Open, No Quiz File Selected'
+            )
+          end
+        }
+
+        log_top.update()
+        log_top['geometry'] = calc_center_geometry(log_top, 10, 10)
+      else
+        Tk.messageBox(
+          'type' => 'ok',
+          'icon' => 'error',
+          'title' => 'Unable to Read Log File',
+          'message' => "Unable to Read Log File, File Doesn't Exist!"
+        )
+      end
+    rescue => e
+      Tk.messageBox(
+        'type' => 'ok',
+        'icon' => 'error',
+        'title' => 'Logging Exception Occurred',
+        'message' => 'Error Reading Log File: ' + e.message
+      )
     end
-
-    logger = Logger.new
-    quiz_attempts = logger.read_from_log
-
-    quiz_num = 1
-    for attempt in quiz_attempts do
-      list.insert(quiz_num - 1, quiz_num.to_s + ". - " + attempt.quiz_name)
-      quiz_num += 1
-    end
-
-    open_button = TkButton.new(log_top) {
-      text 'Open Results'
-      pack('side' => 'right', 'padx'=>5, 'pady'=>5)
-    }
-
-    open_button.comman = Proc.new {
-      display_results(quiz_attempts[list.curselection()[0]])
-    }
-
-    log_top.update()
-    log_top['geometry'] = calc_center_geometry(log_top, 10, 10)
-
   end
 
   def display_result_attribute(win, row, name, value)
